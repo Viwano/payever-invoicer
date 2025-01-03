@@ -1,0 +1,43 @@
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
+import { Item } from './item.schema';
+
+@Schema()
+export class Invoice extends Document {
+  @Prop({
+    type: Types.ObjectId,
+    default: () => new Types.ObjectId(),
+    auto: true,
+  })
+  id: Types.ObjectId;
+
+  @Prop({
+    required: true,
+    trim: true,
+    index: true,
+  })
+  customer: string;
+
+  @Prop({
+    required: true,
+    min: 0,
+  })
+  amount: number;
+
+  @Prop({
+    unique: true,
+    trim: true,
+  })
+  reference: string;
+
+  @Prop({
+    required: true,
+    default: Date.now,
+  })
+  date: Date;
+
+  @Prop()
+  items: Item[];
+}
+
+export const InvoiceSchema = SchemaFactory.createForClass(Invoice);
