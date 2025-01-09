@@ -9,7 +9,10 @@ import {
   IsNotEmpty,
   MaxLength,
   Matches,
+  ValidateIf,
 } from 'class-validator';
+import { CustomInvoiceValidator } from './../common/validators/invoice.validator';
+import { Validate } from 'class-validator';
 
 export class CreateInvoiceDto {
   @IsString()
@@ -23,6 +26,21 @@ export class CreateInvoiceDto {
 
   @IsNumber()
   @Min(0)
+  @ValidateIf(
+    (object: any) => {
+      return (
+        object.amount ===
+        object.items.reduce(
+          (sum: number, item: any) => sum + item.price * item.quantity,
+          0,
+        )
+      );
+    },
+    {
+      message:
+        'Invoice total amount must match the sum of all items (price * quantity)',
+    },
+  )
   amount: number;
 
   @IsString()
