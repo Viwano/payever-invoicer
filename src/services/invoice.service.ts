@@ -1,12 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateInvoiceDto } from './../dto/create-invoice.dto';
 import { UpdateInvoiceDto } from './../dto/update-invoice.dto';
 import { Invoice } from './../schemas/invoice.schema';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class InvoiceService {
+  private readonly logger = new Logger(InvoiceService.name);
   constructor(
     @InjectModel(Invoice.name) private invoiceModel: Model<Invoice>,
   ) {}
@@ -64,5 +66,62 @@ export class InvoiceService {
     }
 
     return deletedInvoice;
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_NOON)
+  async generateDailyReport() {
+    this.logger.log('Generating daily sales report...');
+
+    // Get today's start and end timestamps
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    try {
+      // Fetch invoices created today
+      const invoices = await this.invoiceModel
+        .find({
+          date: { $gte: startOfDay, $lte: endOfDay },
+        })
+        .exec();
+
+      // Initialize summary variables
+      let totalSales = 0;
+      const itemSummary: Record<string, number> = {};
+
+      invoices.forEach((invoice) => {
+        totalSales += invoice.amount;
+
+        // Calculate quantity sold per item (group by SKU)
+        invoice.items.forEach((item) => {
+          if (!itemSummary[item.sku]) {
+            itemSummary[item.sku] = 0;
+          }
+          itemSummary[item.sku] += item.qt;
+        });
+      });
+
+      // Prepare the summary report
+      const report = {
+        date: startOfDay.toISOString().split('T')[0], // e.g., "2025-01-09"
+        totalSales,
+        items: itemSummary,
+      };
+
+      // Log the report
+      this.logger.log('Daily Sales Report:', report);
+
+      // Optionally save or send the report (e.g., email, database)
+      // await this.saveReport(report);
+    } catch (error) {
+      this.logger.error('Error generating daily sales report', error.stack);
+    }
+  }
+
+  // Optional: Save the report to the database
+  async saveReport(report: any) {
+    // Implement logic to save the report to a collection
   }
 }

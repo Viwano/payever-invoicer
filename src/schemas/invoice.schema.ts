@@ -31,6 +31,12 @@ export class Invoice extends Document {
 
   @Prop()
   items: Item[];
+
+  @Prop({
+    required: true,
+    default: false,
+  })
+  processed: boolean;
 }
 
 export const InvoiceSchema = SchemaFactory.createForClass(Invoice);

@@ -56,13 +56,13 @@ describe('InvoiceController (e2e)', () => {
       date: new Date(),
       items: [
         {
-          name: 'Item 1',
-          quantity: 1,
+          sku: 'Item 1',
+          qt: 1,
           price: 50.0,
         },
         {
-          name: 'Item 2',
-          quantity: 1,
+          sku: 'Item 2',
+          qt: 1,
           price: 50.0,
         },
       ],

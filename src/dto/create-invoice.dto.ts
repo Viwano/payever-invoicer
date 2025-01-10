@@ -58,11 +58,11 @@ export class CreateInvoiceDto {
 export class CreateItemDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  sku: string;
 
   @IsNumber()
   @Min(1)
-  quantity: number;
+  qt: number;
 
   @IsNumber()
   @Min(0)
