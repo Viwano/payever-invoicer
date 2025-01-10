@@ -11,8 +11,6 @@ import {
   Matches,
   ValidateIf,
 } from 'class-validator';
-import { CustomInvoiceValidator } from './../common/validators/invoice.validator';
-import { Validate } from 'class-validator';
 
 export class CreateInvoiceDto {
   @IsString()

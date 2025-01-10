@@ -5,13 +5,6 @@ import { Item } from './item.schema';
 @Schema()
 export class Invoice extends Document {
   @Prop({
-    type: Types.ObjectId,
-    default: () => new Types.ObjectId(),
-    auto: true,
-  })
-  id: Types.ObjectId;
-
-  @Prop({
     required: true,
     trim: true,
     index: true,

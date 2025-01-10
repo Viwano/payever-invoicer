@@ -8,7 +8,6 @@ import {
   Post,
 } from '@nestjs/common';
 import { CreateInvoiceDto } from './../dto/create-invoice.dto';
-import { UpdateInvoiceDto } from './../dto/update-invoice.dto';
 import { InvoiceService } from './../services/invoice.service';
 
 @Controller('invoices')
@@ -31,8 +30,8 @@ export class InvoiceController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateInvoiceDto: UpdateInvoiceDto) {
-    return this.invoiceService.update(id, updateInvoiceDto);
+  update(@Param('id') id: string, @Body() createInvoiceDto: CreateInvoiceDto) {
+    return this.invoiceService.update(id, createInvoiceDto);
   }
 
   @Delete(':id')

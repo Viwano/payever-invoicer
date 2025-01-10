@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateInvoiceDto } from './../dto/create-invoice.dto';
@@ -16,28 +16,52 @@ export class InvoiceService {
     return createdInvoice.save();
   }
 
-  async findAll(): Promise<Invoice[]> {
-    return this.invoiceModel.find().exec();
+  async findAll(limit = 10, skip = 0): Promise<Invoice[]> {
+    return this.invoiceModel
+      .find({ deleted: { $ne: true } })
+      .limit(limit)
+      .skip(skip)
+      .exec();
   }
 
   async findOne(id: string): Promise<Invoice> {
-    return this.invoiceModel.findById(new Types.ObjectId(id)).exec();
+    const invoice = await this.invoiceModel
+      .findById(new Types.ObjectId(id))
+      .exec();
+    if (!invoice) {
+      throw new NotFoundException(`Invoice with ID ${id} not found`);
+    }
+    return invoice;
   }
 
   async update(
     id: string,
     updateInvoiceDto: UpdateInvoiceDto,
   ): Promise<Invoice> {
-    return this.invoiceModel
+    const updatedInvoice = await this.invoiceModel
       .findByIdAndUpdate(
         new Types.ObjectId(id),
         { $set: updateInvoiceDto },
-        { new: true }, // returns the updated document
+        { new: true },
       )
       .exec();
+    if (!updatedInvoice) {
+      throw new NotFoundException(`Invoice with ID ${id} not found`);
+    }
+    return updatedInvoice;
   }
 
   async remove(id: string): Promise<Invoice> {
-    return this.invoiceModel.findByIdAndDelete(new Types.ObjectId(id)).exec();
+    const deletedInvoice = await this.invoiceModel
+      .findByIdAndUpdate(
+        new Types.ObjectId(id),
+        { $set: { deleted: true } },
+        { new: true },
+      )
+      .exec();
+    if (!deletedInvoice) {
+      throw new NotFoundException(`Invoice with ID ${id} not found`);
+    }
+    return deletedInvoice;
   }
 }
