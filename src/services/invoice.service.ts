@@ -12,8 +12,7 @@ export class InvoiceService {
   ) {}
 
   async create(createInvoiceDto: CreateInvoiceDto): Promise<Invoice> {
-    const createdInvoice = new this.invoiceModel(createInvoiceDto);
-    return createdInvoice.save();
+    return this.invoiceModel.create(createInvoiceDto);
   }
 
   async findAll(limit = 10, skip = 0): Promise<Invoice[]> {
@@ -59,9 +58,11 @@ export class InvoiceService {
         { new: true },
       )
       .exec();
+
     if (!deletedInvoice) {
-      throw new NotFoundException(`Invoice with ID ${id} not found`);
+      throw new Error(`Invoice with ID ${id} not found`);
     }
+
     return deletedInvoice;
   }
 }

@@ -3,6 +3,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import { InvoiceService } from './invoice.service';
 import { Invoice } from './../schemas/invoice.schema';
 import { Types } from 'mongoose';
+import { CreateInvoiceDto } from './../dto/create-invoice.dto';
 
 describe('InvoiceService', () => {
   let service: InvoiceService;
@@ -47,12 +48,12 @@ describe('InvoiceService', () => {
       mockInvoiceModel.create.mockResolvedValue(mockInvoice);
 
       const result = await service.create({
-        title: 'Test Invoice',
+        customer: 'Test Invoice',
         amount: 100,
-      } as any);
+      } as CreateInvoiceDto);
 
       expect(mockInvoiceModel.create).toHaveBeenCalledWith({
-        title: 'Test Invoice',
+        customer: 'Test Invoice',
         amount: 100,
       });
       expect(result).toEqual(mockInvoice);
@@ -61,13 +62,18 @@ describe('InvoiceService', () => {
 
   describe('findAll', () => {
     it('should return an array of invoices', async () => {
-      mockInvoiceModel.find.mockReturnValue({
+      const mockQuery = {
+        limit: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue([mockInvoice]),
-      });
+      };
+      mockInvoiceModel.find.mockReturnValue(mockQuery);
 
       const result = await service.findAll();
 
-      expect(mockInvoiceModel.find).toHaveBeenCalled();
+      expect(mockInvoiceModel.find).toHaveBeenCalledWith({
+        deleted: { $ne: true },
+      });
       expect(result).toEqual([mockInvoice]);
     });
   });
@@ -128,20 +134,22 @@ describe('InvoiceService', () => {
 
   describe('remove', () => {
     it('should delete and return the invoice', async () => {
-      mockInvoiceModel.findByIdAndDelete.mockReturnValue({
+      mockInvoiceModel.findByIdAndUpdate.mockReturnValue({
         exec: jest.fn().mockResolvedValue(mockInvoice),
       });
 
       const result = await service.remove(mockInvoice._id.toString());
 
-      expect(mockInvoiceModel.findByIdAndDelete).toHaveBeenCalledWith(
+      expect(mockInvoiceModel.findByIdAndUpdate).toHaveBeenCalledWith(
         mockInvoice._id,
+        { $set: { deleted: true } },
+        { new: true },
       );
       expect(result).toEqual(mockInvoice);
     });
 
     it('should throw an error if the invoice is not found', async () => {
-      mockInvoiceModel.findByIdAndDelete.mockReturnValue({
+      mockInvoiceModel.findByIdAndUpdate.mockReturnValue({
         exec: jest.fn().mockResolvedValue(null),
       });
 
