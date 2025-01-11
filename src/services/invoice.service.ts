@@ -149,9 +149,4 @@ export class InvoiceService {
       this.logger.error('Error generating daily sales report', error.stack);
     }
   }
-
-  // Optional: Save the report to the database
-  async saveReport(report: any) {
-    // Implement logic to save the report to a collection
-  }
 }
