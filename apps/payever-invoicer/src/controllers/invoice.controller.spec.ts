@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import { InvoiceController } from './invoice.controller';
 import { InvoiceService } from './../services/invoice.service';
 import { CreateInvoiceDto } from './../dto/create-invoice.dto';
-import { UpdateInvoiceDto } from 'src/dto/update-invoice.dto';
+import { UpdateInvoiceDto } from './../dto/update-invoice.dto';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('InvoiceController (e2e)', () => {

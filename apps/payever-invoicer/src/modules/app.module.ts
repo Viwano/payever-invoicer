@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { InvoiceService } from 'src/services/invoice.service';
-import { InvoiceController } from 'src/controllers/invoice.controller';
+import { InvoiceService } from './../services/invoice.service';
+import { InvoiceController } from './../controllers/invoice.controller';
 import { Invoice, InvoiceSchema } from './../schemas/invoice.schema';
 import { CustomInvoiceValidator } from './../common/validators/invoice.validator';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ReportService } from 'src/services/report.service';
+import { ReportService } from './../services/report.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({

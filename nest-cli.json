@@ -1,8 +1,22 @@
 {
-  "$schema": "https://json.schemastore.org/nest-cli",
-  "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
-  "compilerOptions": {
-    "deleteOutDir": true
+  "projects": {
+    "payever-invoicer": {
+      "type": "application",
+      "root": "apps/payever-invoicer",
+      "entryFile": "main",
+      "sourceRoot": "apps/payever-invoicer/src"
+    },
+    "report-consumer": {
+      "type": "application",
+      "root": "apps/report-consumer",
+      "entryFile": "main",
+      "sourceRoot": "apps/report-consumer/src"
+    },
+    "shared": {
+      "type": "library",
+      "root": "libs/shared",
+      "entryFile": "index",
+      "sourceRoot": "libs/shared/src"
+    }
   }
 }
