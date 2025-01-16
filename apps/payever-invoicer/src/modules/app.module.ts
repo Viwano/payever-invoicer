@@ -6,7 +6,6 @@ import { Invoice, InvoiceSchema } from './../schemas/invoice.schema';
 import { CustomInvoiceValidator } from './../common/validators/invoice.validator';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ReportService } from './../services/report.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
@@ -36,7 +35,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ]),
   ],
   controllers: [InvoiceController],
-  providers: [InvoiceService, CustomInvoiceValidator, ReportService],
+  providers: [InvoiceService, CustomInvoiceValidator],
   exports: [InvoiceService],
 })
 export class AppModule {}
