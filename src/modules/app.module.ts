@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from '../controllers/app.controller';
-import { AppService } from '../services/app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { InvoiceService } from 'src/services/invoice.service';
 import { InvoiceController } from 'src/controllers/invoice.controller';
@@ -10,6 +8,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ReportService } from 'src/services/report.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { AppController } from 'src/controllers/app.controller';
 
 @Module({
   imports: [
@@ -38,12 +37,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ]),
   ],
   controllers: [AppController, InvoiceController],
-  providers: [
-    AppService,
-    InvoiceService,
-    CustomInvoiceValidator,
-    ReportService,
-  ],
+  providers: [InvoiceService, CustomInvoiceValidator, ReportService],
   exports: [InvoiceService],
 })
 export class AppModule {}
