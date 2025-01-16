@@ -11,6 +11,7 @@ import {
   Matches,
   ValidateIf,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateInvoiceDto {
   @IsString()
@@ -19,6 +20,10 @@ export class CreateInvoiceDto {
   @Matches(/^[a-zA-Z0-9\s-]+$/, {
     message:
       'Customer name can only contain letters, numbers, spaces and hyphens',
+  })
+  @ApiProperty({
+    description: 'The customer name',
+    example: 'Vahid',
   })
   customer: string;
 
@@ -39,19 +44,46 @@ export class CreateInvoiceDto {
         'Invoice total amount must match the sum of all items (price * quantity)',
     },
   )
+  @ApiProperty({
+    description: 'The total amount of invoice',
+    example: '100',
+  })
   amount: number;
 
   @IsString()
   @IsNotEmpty()
+  @ApiProperty({
+    description: 'The related invoice number',
+    example: 'INV-001',
+  })
   reference: string;
 
   @IsDate()
   @Type(() => Date)
+  @ApiProperty({
+    description: 'The invoice date',
+    example: '2024-01-10T10:00:00.000Z',
+  })
   date: Date;
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateItemDto)
+  @ApiProperty({
+    description: 'The product items of an invoice',
+    example: [
+      {
+        name: 'Item 1',
+        quantity: 1,
+        price: 50,
+      },
+      {
+        name: 'Item 2',
+        quantity: 1,
+        price: 50,
+      },
+    ],
+  })
   items: CreateItemDto[];
 }
 

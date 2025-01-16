@@ -8,7 +8,6 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ReportService } from 'src/services/report.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AppController } from 'src/controllers/app.controller';
 
 @Module({
   imports: [
@@ -36,7 +35,7 @@ import { AppController } from 'src/controllers/app.controller';
       },
     ]),
   ],
-  controllers: [AppController, InvoiceController],
+  controllers: [InvoiceController],
   providers: [InvoiceService, CustomInvoiceValidator, ReportService],
   exports: [InvoiceService],
 })
