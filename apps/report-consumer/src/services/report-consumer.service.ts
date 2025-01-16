@@ -1,4 +1,4 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { EmailService } from './email.service';
 import { ReportDto } from './../dto/report.dto';
@@ -11,10 +11,7 @@ export class ReportService {
   constructor(
     private readonly emailService: EmailService,
     private readonly configService: ConfigService,
-    @Inject(Logger) private readonly injectedLogger: Logger,
-  ) {
-    this.logger = injectedLogger;
-  }
+  ) {}
 
   @MessagePattern('invoice_reports')
   async handleGeneratedReport(@Payload() report: ReportDto) {

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { CreateInvoiceDto } from './../dto/create-invoice.dto';
 import { InvoiceService } from './../services/invoice.service';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('invoices')
 export class InvoiceController {

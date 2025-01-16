@@ -14,10 +14,10 @@ export class InvoiceService {
   @Client({
     transport: Transport.RMQ,
     options: {
-      urls: ['amqp://localhost:5672'], // URL to RabbitMQ server
-      queue: 'invoice_reports', // Name of the queue
+      urls: ['amqp://localhost:5672'],
+      queue: 'invoice_reports_queue',
       queueOptions: {
-        durable: true, // Ensures messages are persisted to disk
+        durable: true,
       },
     },
   })
@@ -82,11 +82,10 @@ export class InvoiceService {
     return deletedInvoice;
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_NOON)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async generateDailyReport() {
     this.logger.log('Generating daily sales report...');
 
-    // Get today's start and end timestamps
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
 
@@ -94,7 +93,6 @@ export class InvoiceService {
     endOfDay.setHours(23, 59, 59, 999);
 
     try {
-      // Fetch invoices created today
       const invoices = await this.invoiceModel
         .find({
           date: { $gte: startOfDay, $lte: endOfDay },
@@ -107,14 +105,12 @@ export class InvoiceService {
         return;
       }
 
-      // Initialize summary variables
       let totalSales = 0;
       const itemSummary: Record<string, number> = {};
 
       invoices.forEach((invoice) => {
         totalSales += invoice.amount;
 
-        // Calculate quantity sold per item (group by SKU)
         invoice.items.forEach((item) => {
           if (!itemSummary[item.sku]) {
             itemSummary[item.sku] = 0;
@@ -123,28 +119,20 @@ export class InvoiceService {
         });
       });
 
-      // Prepare the summary report
       const report = {
         date: startOfDay.toISOString().split('T')[0], // e.g., "2025-01-09"
         totalSales,
         items: itemSummary,
       };
-
-      // Log the report
       this.logger.log('Daily Sales Report:', report);
 
-      // Send the report to RabbitMQ
-      await this.client.emit('generate_report', report);
+      await this.client.emit('invoice_reports', report);
 
-      // Mark invoices as processed
       await this.invoiceModel.updateMany(
         { _id: { $in: invoices.map((invoice) => invoice._id) } },
         { $set: { processed: true } },
       );
       this.logger.log(`${invoices.length} invoices marked as processed.`);
-
-      // Optionally save or send the report (e.g., email, database)
-      // await this.saveReport(report);
     } catch (error) {
       this.logger.error('Error generating daily sales report', error.stack);
     }
