@@ -29,7 +29,7 @@ export class Invoice extends Document {
   })
   date: Date;
 
-  @Prop()
+  @Prop({ type: [Item], required: true })
   items: Item[];
 
   @Prop({

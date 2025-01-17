@@ -4,12 +4,30 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug NestJS",
-      "program": "${workspaceFolder}/dist/main.js",
-      "preLaunchTask": "npm: build",
-      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+      "name": "Debug Invoicer API",
+      "program": "${workspaceFolder}/dist/apps/payever-invoicer/src/main.js",
+      "outFiles": ["${workspaceFolder}/dist/apps/payever-invoicer/**/*.js"],
       "sourceMaps": true,
-      "restart": true
+      "restart": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Report Worker App",
+      "program": "${workspaceFolder}/dist/apps/report-consumer/src/main.js",
+      "outFiles": ["${workspaceFolder}/dist/apps/report-consumer/**/*.js"],
+      "sourceMaps": true,
+      "restart": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "NODE_ENV": "development"
+      }
     }
   ]
 }

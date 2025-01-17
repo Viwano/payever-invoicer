@@ -120,7 +120,7 @@ export class InvoiceService {
       });
 
       const report = {
-        date: startOfDay.toISOString().split('T')[0], // e.g., "2025-01-09"
+        date: startOfDay.toISOString().split('T')[0],
         totalSales,
         items: itemSummary,
       };
