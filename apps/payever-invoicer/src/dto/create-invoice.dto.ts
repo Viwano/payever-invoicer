@@ -62,7 +62,7 @@ export class CreateInvoiceDto {
   @Type(() => Date)
   @ApiProperty({
     description: 'The invoice date',
-    example: '2024-01-10T10:00:00.000Z',
+    example: '2025-01-17T10:00:00.000Z',
   })
   date: Date;
 
@@ -73,13 +73,13 @@ export class CreateInvoiceDto {
     description: 'The product items of an invoice',
     example: [
       {
-        name: 'Item 1',
-        quantity: 1,
+        sku: 'Item 1',
+        qt: 1,
         price: 50,
       },
       {
-        name: 'Item 2',
-        quantity: 1,
+        sku: 'Item 2',
+        qt: 1,
         price: 50,
       },
     ],
