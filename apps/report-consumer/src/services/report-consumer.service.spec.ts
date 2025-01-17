@@ -9,7 +9,11 @@ describe('ReportService', () => {
   let service: ReportService;
   let emailService: EmailService;
   let configService: ConfigService;
-  let logger: Logger;
+
+  const mockLogger = {
+    log: jest.fn(),
+    error: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,10 +33,7 @@ describe('ReportService', () => {
         },
         {
           provide: Logger,
-          useValue: {
-            log: jest.fn(),
-            error: jest.fn(),
-          },
+          useValue: mockLogger,
         },
       ],
     }).compile();
@@ -40,7 +41,6 @@ describe('ReportService', () => {
     service = module.get<ReportService>(ReportService);
     emailService = module.get<EmailService>(EmailService);
     configService = module.get<ConfigService>(ConfigService);
-    logger = module.get<Logger>(Logger);
   });
 
   it('should be defined', () => {
@@ -58,12 +58,12 @@ describe('ReportService', () => {
 
     it('should log the received report', async () => {
       await service.handleGeneratedReport(mockReport);
-      expect(logger.log).toHaveBeenCalledWith(
+      expect(mockLogger.log).toHaveBeenCalledWith(
         `Received report: ${JSON.stringify(mockReport)}`,
       );
     });
 
-    it('should generate the correct email content', async () => {
+    it('should generate the correct email content', () => {
       const emailContent = service['generateEmailContent'](mockReport);
       expect(emailContent).toContain('Daily Sales Report');
       expect(emailContent).toContain('Total Sales: $1000');
@@ -73,9 +73,20 @@ describe('ReportService', () => {
       expect(emailContent).toContain('SKU: 456, Quantity Sold: 5, Total: $50');
     });
 
+    it('should send an email with the correct content and recipient', async () => {
+      await service.handleGeneratedReport(mockReport);
+
+      const emailContent = service['generateEmailContent'](mockReport);
+      expect(emailService.sendEmail).toHaveBeenCalledWith({
+        to: 'recipient@example.com',
+        subject: 'Daily Sales Report',
+        text: emailContent,
+      });
+    });
+
     it('should log success after sending the email', async () => {
       await service.handleGeneratedReport(mockReport);
-      expect(logger.log).toHaveBeenCalledWith('Email sent successfully');
+      expect(mockLogger.log).toHaveBeenCalledWith('Email sent successfully');
     });
 
     it('should log an error if email sending fails', async () => {
@@ -85,9 +96,12 @@ describe('ReportService', () => {
 
       await service.handleGeneratedReport(mockReport);
 
-      expect(logger.error).toHaveBeenCalledWith('Failed to process report', {
-        error: new Error('Email sending failed'),
-      });
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        'Failed to process report',
+        {
+          error: new Error('Email sending failed'),
+        },
+      );
     });
   });
 });
