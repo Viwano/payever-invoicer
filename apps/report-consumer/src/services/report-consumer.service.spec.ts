@@ -49,11 +49,12 @@ describe('ReportService', () => {
 
   describe('handleGeneratedReport', () => {
     const mockReport: ReportDto = {
-      totalSales: 1000,
-      items: [
-        { sku: '123', qt: 10, price: 100 },
-        { sku: '456', qt: 5, price: 50 },
-      ],
+      date: '2025-01-17',
+      totalSales: 100,
+      items: {
+        'Item 1': 1,
+        'Item 2': 1,
+      },
     };
 
     it('should log the received report', async () => {

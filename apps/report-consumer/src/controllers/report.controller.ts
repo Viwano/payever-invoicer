@@ -9,8 +9,8 @@ export class ReportController {
   private readonly logger = new Logger(ReportController.name);
   constructor(private readonly reportService: ReportService) {}
 
-  @EventPattern('invoice_reports_queue')
-  async handleInvoice(@Payload() data: any) {
+  @EventPattern('daily')
+  async handleInvoice(data: ReportDto) {
     this.logger.log(JSON.stringify(data));
     await this.reportService.handleGeneratedReport(data);
   }

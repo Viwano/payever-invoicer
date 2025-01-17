@@ -116,7 +116,7 @@ export class InvoiceService {
       };
       this.logger.log('Daily Sales Report:', report);
 
-      await this.client.emit('invoice_reports', report);
+      await this.client.emit('daily', report);
 
       await this.invoiceModel.updateMany(
         { _id: { $in: invoices.map((invoice) => invoice._id) } },

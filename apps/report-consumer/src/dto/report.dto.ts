@@ -1,14 +1,14 @@
-import { IsNumber, IsArray, ValidateNested } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
 export class ReportDto {
+  @IsNotEmpty()
+  @IsString()
+  date: string;
+
+  @IsNotEmpty()
   @IsNumber()
   totalSales: number;
 
-  @IsArray()
-  @ValidateNested({ each: true })
-  items: Array<{
-    sku: string;
-    qt: number;
-    price: number;
-  }>;
+  @IsNotEmpty()
+  items: Record<string, number>;
 }

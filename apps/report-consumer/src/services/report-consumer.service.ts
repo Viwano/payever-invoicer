@@ -17,7 +17,7 @@ export class ReportService {
 
     try {
       const emailContent = this.generateEmailContent(report);
-      const recipient = this.configService.get<string>('RECIPIENT_EMAIL');
+      const recipient = this.configService.get<string>('EMAIL_RECIPIENT');
 
       await this.emailService.sendEmail({
         to: recipient,
@@ -37,8 +37,8 @@ export class ReportService {
     content += `Total Sales: $${report.totalSales}\n\n`;
     content += 'Items:\n';
 
-    for (const item of report.items) {
-      content += `SKU: ${item.sku}, Quantity Sold: ${item.qt}, Total: $${item.price}\n`;
+    for (const [itemName, quantity] of Object.entries(report.items)) {
+      content += `Item: ${itemName}, Quantity Sold: ${quantity}\n`;
     }
 
     return content;
