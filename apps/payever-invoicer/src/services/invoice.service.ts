@@ -1,30 +1,20 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateInvoiceDto } from './../dto/create-invoice.dto';
 import { UpdateInvoiceDto } from './../dto/update-invoice.dto';
 import { Invoice } from './../schemas/invoice.schema';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { ClientProxy, Client, Transport } from '@nestjs/microservices';
+import { ClientProxy } from '@nestjs/microservices';
+import { RABBITMQ_CLIENT } from './../microservices/rabbitmq.providers';
 
 @Injectable()
 export class InvoiceService {
   private readonly logger = new Logger(InvoiceService.name);
 
-  @Client({
-    transport: Transport.RMQ,
-    options: {
-      urls: ['amqp://localhost:5672'],
-      queue: 'invoice_reports_queue',
-      queueOptions: {
-        durable: true,
-      },
-    },
-  })
-  private client: ClientProxy;
-
   constructor(
     @InjectModel(Invoice.name) private invoiceModel: Model<Invoice>,
+    @Inject(RABBITMQ_CLIENT) private readonly client: ClientProxy,
   ) {}
 
   async create(createInvoiceDto: CreateInvoiceDto): Promise<Invoice> {
