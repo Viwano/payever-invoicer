@@ -4,10 +4,13 @@ import { InvoiceService } from './invoice.service';
 import { Invoice } from './../schemas/invoice.schema';
 import { Types } from 'mongoose';
 import { CreateInvoiceDto } from './../dto/create-invoice.dto';
+import { ClientProxy } from '@nestjs/microservices';
+import { RABBITMQ_CLIENT } from './../microservices/rabbitmq.providers';
 
 describe('InvoiceService', () => {
   let service: InvoiceService;
   let mockInvoiceModel: any;
+  let rabbitmqClient: ClientProxy;
 
   const mockInvoice = {
     _id: new Types.ObjectId(),
@@ -33,10 +36,19 @@ describe('InvoiceService', () => {
           provide: getModelToken(Invoice.name),
           useValue: mockInvoiceModel,
         },
+        {
+          provide: RABBITMQ_CLIENT,
+          useValue: {
+            emit: jest.fn().mockReturnValue({
+              toPromise: jest.fn(),
+            }),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<InvoiceService>(InvoiceService);
+    rabbitmqClient = module.get<ClientProxy>(RABBITMQ_CLIENT);
   });
 
   it('should be defined', () => {
