@@ -5,10 +5,11 @@ import { ReportDto } from './../dto/report.dto';
 
 @Injectable()
 export class ReportService {
+  private readonly logger = new Logger(ReportService.name);
+
   constructor(
     private readonly emailService: EmailService,
     private readonly configService: ConfigService,
-    private readonly logger: Logger,
   ) {}
 
   async handleGeneratedReport(report: ReportDto): Promise<void> {
