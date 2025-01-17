@@ -19,6 +19,7 @@ export class ReportService {
       const emailContent = this.generateEmailContent(report);
       const recipient = this.configService.get<string>('EMAIL_RECIPIENT');
 
+      this.logger.log(`Email content: ${JSON.stringify(emailContent)}`);
       await this.emailService.sendEmail({
         to: recipient,
         subject: 'Daily Sales Report',
@@ -26,14 +27,14 @@ export class ReportService {
       });
       this.logger.log('Email sent successfully');
     } catch (error) {
-      this.logger.error('Failed to process report', {
+      this.logger.error('Failed to send email', {
         error,
       });
     }
   }
 
   private generateEmailContent(report: ReportDto): string {
-    let content = 'Daily Sales Report\n\n';
+    let content = `Daily Sales Report-${report.date}\n\n`;
     content += `Total Sales: $${report.totalSales}\n\n`;
     content += 'Items:\n';
 
