@@ -6,7 +6,7 @@ import { UpdateInvoiceDto } from './../dto/update-invoice.dto';
 import { Invoice } from './../schemas/invoice.schema';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ClientProxy } from '@nestjs/microservices';
-import { RABBITMQ_CLIENT } from './../microservices/rabbitmq.providers';
+import { RABBITMQ_CLIENT } from './../modules/rabbitmq.module';
 
 @Injectable()
 export class InvoiceService {

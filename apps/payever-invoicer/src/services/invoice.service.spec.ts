@@ -5,7 +5,7 @@ import { Invoice } from './../schemas/invoice.schema';
 import { Types } from 'mongoose';
 import { CreateInvoiceDto } from './../dto/create-invoice.dto';
 import { ClientProxy } from '@nestjs/microservices';
-import { RABBITMQ_CLIENT } from './../microservices/rabbitmq.providers';
+import { RABBITMQ_CLIENT } from './../modules/rabbitmq.module';
 
 describe('InvoiceService', () => {
   let service: InvoiceService;
