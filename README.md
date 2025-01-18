@@ -1,99 +1,168 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Payever Technical Assessment Project
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Welcome to the Payever Technical Assessment Project! This project demonstrates my skills in building scalable, modular, and efficient microservices using **Nest.js**, **MongoDB**, and **RabbitMQ**. It showcases my ability to design and implement a system that handles invoice generation, report distribution, and message queuing, all while adhering to best practices in software development and DevOps.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This project is a testament to my passion for solving real-world problems with clean, maintainable, and well-documented code. I hope it reflects my dedication to excellence and my enthusiasm for joining the Payever team.
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Project Overview
 
-## Project setup
+The project consists of two microservices:
+
+1. **Invoicer Service**: A REST API for creating invoices and a cron job that generates daily reports, emitting them to a RabbitMQ queue.
+2. **Report Consumer Service**: A microservice that consumes reports from RabbitMQ and sends them via email.
+
+The system is designed to be **scalable**, **decoupled**, and **easy to maintain**, leveraging modern technologies and tools.
+
+---
+
+## Key Features
+
+- **REST API**: Create and manage invoices via a well-defined API.
+- **Cron Job**: Automatically generate and queue reports daily at 12 PM.
+- **Message Queuing**: Use RabbitMQ to decouple the invoicer and email microservices.
+- **Health Checks**: Monitor the health of the invoicer service to ensure reliability.
+- **Dockerized Setup**: Easy-to-run setup using Docker and Docker Compose.
+
+---
+
+## Technologies Used
+
+- **Backend**: Nest.js (Node.js framework)
+- **Database**: MongoDB
+- **Message Queue**: RabbitMQ
+- **Package Manager**: pnpm
+- **Containerization**: Docker and Docker Compose
+- **DevOps**: Health checks, multi-stage Docker builds, and environment variable management
+
+---
+
+## Project Structure
+
+The project is organized as a monorepo with the following structure:
+
+payever-assessment/
+├── apps/
+│ ├── payever-invoicer/ # Invoicer service (REST API + cron job)
+│ │ ├── src/ # Source code for the invoicer service
+│ │ ├── Dockerfile # Dockerfile for the invoicer service
+│ │ └── package.json # Dependencies for the invoicer service
+│ ├── report-consumer/ # Report consumer service (email microservice)
+│ │ ├── src/ # Source code for the email microservice
+│ │ ├── Dockerfile # Dockerfile for the email microservice
+│ │ └── package.json # Dependencies for the email microservice
+│ └── ... # Other apps (if any)
+├── docker-compose.yaml # Docker Compose configuration
+├── package.json # Root package.json for the monorepo
+├── pnpm-lock.yaml # Lock file for pnpm
+└── README.md # Project documentation
+Copy
+
+---
+
+## How to Run the Project
+
+### Prerequisites
+
+Before running the project, ensure you have the following installed:
+
+- **Docker**: [Install Docker](https://docs.docker.com/get-docker/)
+- **Docker Compose**: [Install Docker Compose](https://docs.docker.com/compose/install/)
+- **pnpm**: [Install pnpm](https://pnpm.io/installation)
+
+---
+
+### Step-by-Step Guide
+
+#### 1. Clone the Repository
+
+Clone the repository to your local machine:
 
 ```bash
-$ pnpm install
+git clone https://github.com/your-username/payever-assessment.git
+cd payever-assessment
+
+2. Set Up Environment Variables
+
+Ensure the following environment variables are set in your docker-compose.yaml file or in a .env file:
+
+    MongoDB:
+
+        MONGO_INITDB_ROOT_USERNAME: Root username for MongoDB.
+
+        MONGO_INITDB_ROOT_PASSWORD: Root password for MongoDB.
+
+    RabbitMQ:
+
+        RABBITMQ_DEFAULT_USER: Username for RabbitMQ.
+
+        RABBITMQ_DEFAULT_PASS: Password for RabbitMQ.
+
+    Invoicer Service:
+
+        MONGODB_URI: MongoDB connection string.
+
+        RABBITMQ_URL: RabbitMQ connection string.
+
+    Report Consumer Service:
+
+        RABBITMQ_URL: RabbitMQ connection string.
+
+3. Build and Run the Project
+
+Use Docker Compose to build and run the project:
+bash
+Copy
+
+docker-compose up --build
+
+This will:
+
+    Start MongoDB and RabbitMQ.
+
+    Build and start the invoicer service.
+
+    Build and start the report-consumer service.
+
+4. Access the Services
+
+    Invoicer Service: Access the REST API at http://localhost:3000.
+
+        Health check endpoint: http://localhost:3000/health.
+
+    RabbitMQ Management UI: Access the RabbitMQ management interface at http://localhost:15672.
+
+        Username: payever
+
+        Password: 112358
+
+5. Stop the Project
+
+To stop the project, run:
+bash
+Copy
+
+docker-compose down
+
+Why This Project?
+
+This project reflects my commitment to building robust, scalable, and maintainable systems. It demonstrates my ability to:
+
+    Design and implement microservices using Nest.js.
+
+    Use message queuing (RabbitMQ) to decouple services.
+
+    Containerize applications using Docker and Docker Compose.
+
+    Write clean, well-documented, and efficient code.
+
+I believe that my technical skills, combined with my passion for innovation and problem-solving, make me a strong candidate for the Payever team. I am excited about the opportunity to contribute to Payever's mission and grow as part of your talented team.
+Final Thoughts
+
+Thank you for taking the time to review my technical assessment project. I hope it provides a clear picture of my capabilities and my enthusiasm for joining Payever. I am eager to bring my skills and dedication to your team and contribute to building innovative solutions that make a difference.
+
+Let’s build the future together! 🚀
+
+If you have any questions or would like to discuss the project further, please feel free to reach out. I look forward to the opportunity to work with you!
 ```
-
-## Compile and run the project
-
-```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
