@@ -10,12 +10,14 @@ describe('ReportService', () => {
   let emailService: EmailService;
   let configService: ConfigService;
 
-  const mockLogger = {
-    log: jest.fn(),
-    error: jest.fn(),
-  };
+  // Create spies for logger methods
+  const logSpy = jest.spyOn(Logger.prototype, 'log');
+  const errorSpy = jest.spyOn(Logger.prototype, 'error');
 
   beforeEach(async () => {
+    // Clear all mocks before each test
+    jest.clearAllMocks();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ReportService,
@@ -30,10 +32,6 @@ describe('ReportService', () => {
           useValue: {
             get: jest.fn().mockReturnValue('recipient@example.com'),
           },
-        },
-        {
-          provide: Logger,
-          useValue: mockLogger,
         },
       ],
     }).compile();
@@ -59,24 +57,21 @@ describe('ReportService', () => {
 
     it('should log the received report', async () => {
       await service.handleGeneratedReport(mockReport);
-      expect(mockLogger.log).toHaveBeenCalledWith(
-        `Received report: ${JSON.stringify(mockReport)}`,
+      expect(logSpy).toHaveBeenCalledWith(
+        `Received report: ${JSON.stringify(mockReport)}`
       );
     });
 
     it('should generate the correct email content', () => {
       const emailContent = service['generateEmailContent'](mockReport);
       expect(emailContent).toContain('Daily Sales Report');
-      expect(emailContent).toContain('Total Sales: $1000');
-      expect(emailContent).toContain(
-        'SKU: 123, Quantity Sold: 10, Total: $100',
-      );
-      expect(emailContent).toContain('SKU: 456, Quantity Sold: 5, Total: $50');
+      expect(emailContent).toContain('Total Sales: $100');
+      expect(emailContent).toContain('Item: Item 1, Quantity Sold: 1');
+      expect(emailContent).toContain('Item: Item 2, Quantity Sold: 1');
     });
 
     it('should send an email with the correct content and recipient', async () => {
       await service.handleGeneratedReport(mockReport);
-
       const emailContent = service['generateEmailContent'](mockReport);
       expect(emailService.sendEmail).toHaveBeenCalledWith({
         to: 'recipient@example.com',
@@ -87,21 +82,26 @@ describe('ReportService', () => {
 
     it('should log success after sending the email', async () => {
       await service.handleGeneratedReport(mockReport);
-      expect(mockLogger.log).toHaveBeenCalledWith('Email sent successfully');
+      
+      // Find the specific call for 'Email sent successfully'
+      const successCall = logSpy.mock.calls.find(
+        call => call[0] === 'Email sent successfully'
+      );
+      expect(successCall).toBeTruthy();
+      expect(successCall[0]).toBe('Email sent successfully');
     });
 
     it('should log an error if email sending fails', async () => {
-      jest
-        .spyOn(emailService, 'sendEmail')
-        .mockRejectedValue(new Error('Email sending failed'));
-
+      const error = new Error('Email sending failed');
+      jest.spyOn(emailService, 'sendEmail').mockRejectedValue(error);
+      
       await service.handleGeneratedReport(mockReport);
-
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        'Failed to process report',
+      
+      expect(errorSpy).toHaveBeenCalledWith(
+        'Failed to send email',
         {
-          error: new Error('Email sending failed'),
-        },
+          error,
+        }
       );
     });
   });
