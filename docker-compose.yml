@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # MongoDB Service
+  mongo:
+    image: mongo:6.0
+    container_name: mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: payever
+      MONGO_INITDB_ROOT_PASSWORD: 112358
+    restart: unless-stopped
+
+  # RabbitMQ Service
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: rabbitmq
+    ports:
+      - '5672:5672' # RabbitMQ port
+      - '15672:15672' # RabbitMQ Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: payever
+      RABBITMQ_DEFAULT_PASS: 112358
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', 'check_running']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  # Invoicer Service
+  invoicer:
+    build:
+      context: ./apps/payever-invoicer
+      dockerfile: ./apps/payever-invoicer/Dockerfile
+    container_name: invoicer
+    ports:
+      - '3000:3000'
+    environment:
+      MONGODB_URI: mongodb://payever:112358@mongo:27017/invoicer?authSource=admin
+      RABBITMQ_URL: amqp://payever:112358@rabbitmq:5672
+      NODE_ENV: production
+      PORT: 3000
+    depends_on:
+      - mongo
+      - rabbitmq
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  # Email Microservice
+  email-microservice:
+    build:
+      context: ./apps/report-consumer
+      dockerfile: ./apps/report-consumer/Dockerfile
+    container_name: email-microservice
+    environment:
+      RABBITMQ_URL: amqp://payever:112358@rabbitmq:5672
+    depends_on:
+      invoicer:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+# Volumes for persistent data
+volumes:
+  mongo_data:
+  rabbitmq_data:
