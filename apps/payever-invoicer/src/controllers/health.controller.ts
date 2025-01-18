@@ -25,7 +25,7 @@ export class HealthController {
           transport: Transport.RMQ,
           options: {
             urls: [process.env.RABBITMQ_URL],
-            queue: 'reports_queue',
+            queue: 'health_queue',
           },
         }),
 

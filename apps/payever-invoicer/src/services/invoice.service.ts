@@ -72,7 +72,7 @@ export class InvoiceService {
     return deletedInvoice;
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_DAY_AT_NOON)
   async generateDailyReport() {
     this.logger.log('Generating daily sales report...');
 
