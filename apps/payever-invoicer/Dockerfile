@@ -4,8 +4,8 @@ FROM node:18-alpine AS builder
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install pnpm and nest CLI globally
+RUN npm install -g pnpm @nestjs/cli
 
 # Create non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
@@ -14,16 +14,15 @@ WORKDIR /app
 
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
-COPY apps/payever-invoicer/package.json ./apps/payever-invoicer/package.json
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
 # Copy source
 COPY apps/payever-invoicer ./apps/payever-invoicer
-
+WORKDIR /app/apps/payever-invoicer
 # Build
-RUN pnpm run build --filter=payever-invoicer
+RUN pnpm run build
 
 # Production stage
 FROM node:18-alpine
@@ -41,8 +40,8 @@ WORKDIR /app
 
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
-COPY apps/payever-invoicer/package.json ./apps/payever-invoicer/package.json
 
+WORKDIR /app/apps/payever-invoicer
 # Install production dependencies
 RUN pnpm install --production --filter=payever-invoicer
 
