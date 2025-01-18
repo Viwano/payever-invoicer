@@ -1,7 +1,4 @@
-version: '3.8'
-
 services:
-  # MongoDB Service
   mongo:
     image: mongo:6.0
     container_name: mongo
@@ -14,13 +11,12 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: 112358
     restart: unless-stopped
 
-  # RabbitMQ Service
   rabbitmq:
     image: rabbitmq:3.11-management
     container_name: rabbitmq
     ports:
-      - '5672:5672' # RabbitMQ port
-      - '15672:15672' # RabbitMQ Management UI
+      - '5672:5672'
+      - '15672:15672'
     environment:
       RABBITMQ_DEFAULT_USER: payever
       RABBITMQ_DEFAULT_PASS: 112358
@@ -34,11 +30,10 @@ services:
       start_period: 20s
     restart: unless-stopped
 
-  # Invoicer Service
   invoicer:
     build:
       context: .
-      dockerfile: /apps/payever-invoicer/Dockerfile
+      dockerfile: apps/payever-invoicer/Dockerfile
     container_name: invoicer
     ports:
       - '3000:3000'
@@ -58,11 +53,10 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  # Email Microservice
   email-microservice:
     build:
       context: .
-      dockerfile: /apps/report-consumer/Dockerfile
+      dockerfile: apps/report-consumer/Dockerfile
     container_name: email-microservice
     environment:
       RABBITMQ_URL: amqp://payever:112358@rabbitmq:5672
@@ -73,7 +67,6 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-# Volumes for persistent data
 volumes:
   mongo_data:
   rabbitmq_data:

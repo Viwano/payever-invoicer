@@ -1,43 +1,31 @@
-# Stage 1: Build the application
 FROM node:18-alpine AS builder
 
 # Install pnpm and nest CLI globally
-RUN npm install -g pnpm @nestjs/cli
+RUN npm install -g pnpm
+RUN npm install -g @nestjs/cli
+# Set the pnpm store directory explicitly
+RUN pnpm config set store-dir /root/.local/share/pnpm/store/v3
 
-# Set the working directory
 WORKDIR /app
 
-# Copy package.json and pnpm-lock.yaml
-COPY package.json pnpm-lock.yaml ./
+# Copy the entire project first to ensure tsconfig and other necessary files are available
+COPY . .
 
-# Install dependencies using pnpm
+# Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copy the rest of the application code
-COPY apps/report-consumer ./apps/report-consumer
-
 WORKDIR /app/apps/report-consumer
-# Build the application
 RUN pnpm run build
 
-# Stage 2: Create the production image
 FROM node:18-alpine
-
-# Install pnpm
+# Install pnpm and nest CLI globally
 RUN npm install -g pnpm
+RUN npm install -g @nestjs/cli
 
-# Set the working directory
 WORKDIR /app
-
-# Copy package.json and pnpm-lock.yaml
 COPY package.json pnpm-lock.yaml ./
+COPY --from=builder /app/dist ./dist
 
-WORKDIR /app/apps/report-consumer
-# Install only production dependencies using pnpm
 RUN pnpm install --production --filter=report-consumer
 
-# Copy the built application from the builder stage
-COPY --from=builder /app/apps/report-consumer/dist ./dist
-
-# Command to run the application
 CMD ["node", "dist/main"]
