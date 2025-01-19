@@ -1,6 +1,6 @@
 services:
   mongo:
-    image: mongo:6.0
+    image: mongo:latest
     container_name: mongo
     ports:
       - '27017:27017'
@@ -10,6 +10,8 @@ services:
       MONGO_INITDB_ROOT_USERNAME: payever
       MONGO_INITDB_ROOT_PASSWORD: 112358
     restart: unless-stopped
+    networks:
+      - payever-network
 
   rabbitmq:
     image: rabbitmq:3.11-management
@@ -29,8 +31,10 @@ services:
       retries: 5
       start_period: 20s
     restart: unless-stopped
+    networks:
+      - payever-network
 
-  invoicer:
+  payever-invoicer:
     build:
       context: .
       dockerfile: apps/payever-invoicer/Dockerfile
@@ -52,21 +56,32 @@ services:
       retries: 3
       start_period: 10s
     restart: unless-stopped
+    networks:
+      - payever-network
 
-  email-microservice:
+  report-consumer:
     build:
       context: .
       dockerfile: apps/report-consumer/Dockerfile
-    container_name: email-microservice
+    container_name: reporter
     environment:
       RABBITMQ_URL: amqp://payever:112358@rabbitmq:5672
+    volumes:
+      - ./apps/report-consumer:/app/apps/report-consumer
+      - /app/apps/report-consumer/node_modules
     depends_on:
-      invoicer:
+      payever-invoicer:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - payever-network
 
 volumes:
   mongo_data:
   rabbitmq_data:
+
+networks:
+  payever-network:
+    driver: bridge

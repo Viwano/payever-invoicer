@@ -4,7 +4,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EmailModule } from './email.module';
 import { ReportController } from './../controllers/report.controller';
 import { EmailService } from './../services/email.service';
-import { RabbitMQModule } from './../../../payever-invoicer/src/modules/rabbitmq.module';
 
 @Module({
   imports: [ConfigModule.forRoot(), EmailModule],

@@ -5,7 +5,7 @@
   "author": "Vahid",
   "private": true,
   "scripts": {
-    "build": "nest build",
+    "build": "nest build -- --no-watch",
     "build:payever-invoicer": "nest build payever-invoicer",
     "build:report-consumer": "nest build report-consumer",
     "format": "prettier --write \"{src,apps,libs,test}/**/*.ts\"",

@@ -1,31 +1,32 @@
 FROM node:18-alpine AS builder
 
-# Install pnpm and nest CLI globally
-RUN npm install -g pnpm
-RUN npm install -g @nestjs/cli
-# Set the pnpm store directory explicitly
-RUN pnpm config set store-dir /root/.local/share/pnpm/store/v3
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
-# Copy the entire project first to ensure tsconfig and other necessary files are available
-COPY . .
+# Copy root configuration files
+COPY pnpm-*.yaml ./
+COPY package.json ./
+COPY tsconfig.json ./
+COPY nest-cli.json ./
 
-# Install dependencies
+# Copy the specific app's source
+COPY ./apps/report-consumer ./apps/report-consumer
+
+# Install dependencies and build
 RUN pnpm install --frozen-lockfile
-
-WORKDIR /app/apps/report-consumer
-RUN pnpm run build
+RUN pnpm run build -w @app/report-consumer
 
 FROM node:18-alpine
-# Install pnpm and nest CLI globally
-RUN npm install -g pnpm
-RUN npm install -g @nestjs/cli
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
+
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/pnpm-lock.yaml ./
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
 
-RUN pnpm install --production --filter=report-consumer
-
-CMD ["node", "dist/main"]
+CMD ["node", "dist/apps/report-consumer/main.js"]

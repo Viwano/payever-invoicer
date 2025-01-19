@@ -1,70 +1,33 @@
-# Stage 1: Builder
 FROM node:18-alpine AS builder
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
-ENV PNPM_STORE_DIR=/root/.local/share/pnpm/store/v3
 
-# Install pnpm globally
-RUN npm install -g pnpm
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
-# Copy package files first to leverage Docker cache
-COPY package.json pnpm-lock.yaml ./
+# Copy root configuration files
+COPY pnpm-*.yaml ./
+COPY package.json ./
+COPY tsconfig.json ./
+COPY nest-cli.json ./
 
-# Remove any existing node_modules
-RUN rm -rf node_modules
+# Copy the specific app's source
+COPY ./apps/payever-invoicer ./apps/payever-invoicer
 
-# Install dependencies including devDependencies
-RUN pnpm install --frozen-lockfile --store-dir $PNPM_STORE_DIR
+# Install dependencies and build
+RUN pnpm install --frozen-lockfile
+RUN pnpm run build -w @app/payever-invoicer
 
-# Install @nestjs/cli as a dev dependency
-RUN pnpm add -D @nestjs/cli --store-dir $PNPM_STORE_DIR
-
-# Copy the rest of the project files
-COPY . .
-
-# Build the application
-WORKDIR /app/apps/payever-invoicer
-RUN pnpm run build
-
-# Production stage
 FROM node:18-alpine
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
-ENV PNPM_STORE_DIR=/root/.local/share/pnpm/store/v3
-
-# Install pnpm globally
-RUN npm install -g pnpm
-
-# Create a non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 WORKDIR /app
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/pnpm-lock.yaml ./
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
 
-# Copy package files
-COPY package.json pnpm-lock.yaml ./
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Install production dependencies only
-RUN pnpm install --prod --frozen-lockfile --store-dir $PNPM_STORE_DIR
+EXPOSE 3000
 
-# Copy built application from the builder stage
-COPY --from=builder /app/apps/payever-invoicer/dist ./apps/payever-invoicer/dist
-
-# Switch to non-root user
-USER appuser
-
-# Labels
-LABEL maintainer="Vahid <Wanocop@gmail.com>"
-LABEL description="Payever Invoicer Service"
-LABEL version="1.0"
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:3000/health || exit 1
-
-# Set working directory
-WORKDIR /app/apps/payever-invoicer
-
-# Start the application
-CMD ["node", "dist/main"]
+CMD ["node", "dist/apps/payever-invoicer/main.js"]
