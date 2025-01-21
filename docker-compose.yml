@@ -42,7 +42,7 @@ services:
     ports:
       - '3000:3000'
     environment:
-      MONGODB_URI: mongodb://payever:112358@mongo:27017/invoicer?authSource=admin
+      DATABASE_URI: mongodb://payever:112358@mongo:27017/invoicer?authSource=admin
       RABBITMQ_URL: amqp://payever:112358@rabbitmq:5672
       NODE_ENV: production
       PORT: 3000
