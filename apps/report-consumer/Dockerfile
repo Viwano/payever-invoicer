@@ -29,4 +29,4 @@ COPY --from=builder /app/pnpm-lock.yaml ./
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 
-CMD ["node", "dist/apps/report-consumer/main.js"]
+CMD ["node", "dist/src/main.js"]

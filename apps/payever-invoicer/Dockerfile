@@ -18,6 +18,9 @@ COPY ./apps/payever-invoicer ./apps/payever-invoicer
 RUN pnpm install --frozen-lockfile
 RUN pnpm run build -w @app/payever-invoicer
 
+# Verify the build output
+RUN ls -lR /app/dist
+
 FROM node:18-alpine
 
 WORKDIR /app
@@ -30,4 +33,4 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 EXPOSE 3000
 
-CMD ["node", "dist/apps/payever-invoicer/main.js"]
+CMD ["node", "dist/src/main.js"]
