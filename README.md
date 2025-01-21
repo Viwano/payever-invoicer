@@ -78,7 +78,7 @@ Ensure the following environment variables are set in your docker-compose.yaml f
 
     Invoicer Service:
 
-        MONGODB_URI: MongoDB connection string.
+        DATABASE_URI: MongoDB connection string.
 
         RABBITMQ_URL: RabbitMQ connection string.
 
