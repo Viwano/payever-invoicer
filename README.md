@@ -38,29 +38,6 @@ The system is designed to be **scalable**, **decoupled**, and **easy to maintain
 
 ---
 
-## Project Structure
-
-The project is organized as a monorepo with the following structure:
-
-payever-assessment/
-├── apps/
-│ ├── payever-invoicer/ # Invoicer service (REST API + cron job)
-│ │ ├── src/ # Source code for the invoicer service
-│ │ ├── Dockerfile # Dockerfile for the invoicer service
-│ │ └── package.json # Dependencies for the invoicer service
-│ ├── report-consumer/ # Report consumer service (email microservice)
-│ │ ├── src/ # Source code for the email microservice
-│ │ ├── Dockerfile # Dockerfile for the email microservice
-│ │ └── package.json # Dependencies for the email microservice
-│ └── ... # Other apps (if any)
-├── docker-compose.yaml # Docker Compose configuration
-├── package.json # Root package.json for the monorepo
-├── pnpm-lock.yaml # Lock file for pnpm
-└── README.md # Project documentation
-Copy
-
----
-
 ## How to Run the Project
 
 ### Prerequisites
